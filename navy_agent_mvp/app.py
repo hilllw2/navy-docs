@@ -304,6 +304,8 @@ with st.sidebar:
 
     st.markdown("---")
     top_k = st.slider("Top K retrieval", min_value=3, max_value=12, value=6)
+    chunk_preview_len = st.slider("Chunk preview length", min_value=180, max_value=800, value=420, step=20)
+    st.session_state["chunk_preview_len"] = chunk_preview_len
     memory_turns = st.slider("Short memory turns", min_value=0, max_value=5, value=2)
 
     if st.button("Clear chat memory"):
@@ -319,6 +321,8 @@ with st.sidebar:
         for i, turn in enumerate(reversed(st.session_state.chat_memory[-memory_turns:]), start=1):
             st.markdown(f"**Q{i}:** {turn['q'][:120]}")
             st.markdown(f"**A{i}:** {turn['a'][:160]}")
+
+chunk_preview_len = st.session_state.get("chunk_preview_len", 420)
 
 
 def _build_short_context() -> str:
@@ -344,7 +348,7 @@ def _append_chat_message(role: str, content: str, mode: str, **extra) -> None:
     st.session_state.chat_messages = st.session_state.chat_messages[-40:]
 
 
-def _render_chunk_cards(hits, citations, retrieval_mode, evidence_cards=None) -> None:
+def _render_chunk_cards(hits, citations, retrieval_mode, evidence_cards=None, max_chars: int = 520) -> None:
     evidence_cards = evidence_cards or []
     card_map = {card.get("citation_idx"): card for card in evidence_cards}
     used = {c.get("idx") for c in (citations or [])}
@@ -361,15 +365,13 @@ def _render_chunk_cards(hits, citations, retrieval_mode, evidence_cards=None) ->
         rerank = float(chunk.get("rerank_score") or 0.0)
         used_label = "Used" if idx in used else "Not used"
         chunk_text = chunk.get("chunk_text") or ""
-        max_len = 520
-        preview = chunk_text if len(chunk_text) <= max_len else chunk_text[:max_len].rstrip() + "..."
+        preview = chunk_text if len(chunk_text) <= max_chars else chunk_text[:max_chars].rstrip() + "..."
         source = escape(chunk.get("source_file") or "unknown.pdf")
         page = chunk.get("page_start")
         line = chunk.get("line_start")
         card = card_map.get(idx)
         reason_lines = card.get("why_selected") if card and card.get("why_selected") else []
-
-        reason_text = "<br/>".join(escape(line) for line in reason_lines)
+        reason_text = " • ".join(escape(line) for line in reason_lines[:2])
         preview_html = escape(preview)
         used_class = "used" if idx in used else ""
         default_reason = escape("Semantic match + route decision")
@@ -420,7 +422,7 @@ def _render_plan_card(plan) -> None:
     )
 
 
-def _render_chat_feed():
+def _render_chat_feed(chunk_preview_len: int):
     st.subheader("📟 Conversation Feed")
     with st.container():
         messages = st.session_state.chat_messages
@@ -491,6 +493,7 @@ def _render_chat_feed():
                     msg.get("citations") or [],
                     msg.get("retrieval_mode"),
                     msg.get("evidence_cards") or [],
+                    max_chars=chunk_preview_len,
                 )
             elif role == "assistant" and mode == "topic":
                 ctx_preview = (msg.get("topic_context") or "").strip()
@@ -508,7 +511,7 @@ def _render_chat_feed():
         st.markdown("</div>", unsafe_allow_html=True)
 
 
-_render_chat_feed()
+_render_chat_feed(chunk_preview_len)
 
 st.markdown("---")
 st.markdown(
@@ -562,7 +565,7 @@ if kb_clicked:
         for i, h in enumerate(hits[:4], start=1):
             context_lines.append(
                 f"[{i}] {h.get('source_file')} p.{h.get('page_start')} sim={float(h.get('similarity') or 0.0):.4f} "
-                f"rerank={float(h.get('rerank_score') or 0.0):.4f}\n{(h.get('chunk_text') or '')[:420]}"
+                f"rerank={float(h.get('rerank_score') or 0.0):.4f}\n{(h.get('chunk_text') or '')[:chunk_preview_len]}"
             )
         st.session_state.topic_context = "\n\n".join(context_lines)
         st.session_state.topic_active = bool(hits)

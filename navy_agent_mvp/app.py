@@ -19,30 +19,31 @@ CHAT_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap');
 :root {
-    --ink: #050b16;
-    --deep-navy: #08142e;
+    --ink: #f8f9ff;
+    --deep-navy: #050914;
     --aqua: #4bd6ff;
-    --sand: #ffe4c7;
-    --cloud: #f4f7fb;
-    --card-border: rgba(13, 37, 78, 0.15);
+    --sand: #ffbf8b;
+    --cloud: #121627;
+    --card-border: rgba(255, 255, 255, 0.08);
 }
 .stApp {
     font-family: 'Space Grotesk', sans-serif;
     color: var(--ink);
-    background: radial-gradient(circle at 10% 20%, rgba(31,64,139,0.15), transparent 45%),
-                radial-gradient(circle at 80% 0%, rgba(20,174,221,0.18), transparent 40%),
-                linear-gradient(180deg, #f4f7fc 0%, #eef2fb 40%, #e6ebf7 100%);
+    background: radial-gradient(circle at 20% 30%, rgba(122, 161, 255, 0.35), transparent 45%),
+                radial-gradient(circle at 80% 15%, rgba(255, 133, 91, 0.28), transparent 40%),
+                linear-gradient(180deg, #050914 0%, #0a1324 45%, #0f1a31 100%);
 }
+.stApp header {visibility: hidden;}
 [data-testid="stSidebar"] .block-container {
     font-family: 'Space Grotesk', sans-serif;
 }
 .chat-feed-shell {
-    background: rgba(255, 255, 255, 0.82);
-    border: 1px solid rgba(9, 21, 53, 0.07);
+    background: rgba(16, 22, 41, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 24px;
-    padding: 20px 28px;
-    backdrop-filter: blur(14px);
-    box-shadow: 0 25px 60px rgba(9, 16, 40, 0.08);
+    padding: 24px 32px;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.55);
 }
 .chat-row {
     display: flex;
@@ -59,7 +60,7 @@ CHAT_CSS = """
     width: 44px;
     height: 44px;
     border-radius: 14px;
-    background: var(--deep-navy);
+    background: rgba(255, 255, 255, 0.14);
     color: #f4fbff;
     display: flex;
     align-items: center;
@@ -68,19 +69,19 @@ CHAT_CSS = """
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 .chat-row.user .chat-avatar {
-    background: #e8f1ff;
-    color: #0b285d;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffe6c7;
 }
 .chat-bubble {
     max-width: min(780px, 90%);
     border-radius: 22px;
     padding: 18px 22px 20px;
-    background: #ffffff;
-    box-shadow: 0 20px 60px rgba(8, 17, 46, 0.08);
-    border: 1px solid rgba(9, 23, 64, 0.1);
+    background: rgba(4, 7, 17, 0.95);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .chat-row.user .chat-bubble {
-    background: #041c3f;
+    background: #13213e;
     border-color: rgba(75, 214, 255, 0.2);
     color: #e9f4ff;
 }
@@ -97,14 +98,14 @@ CHAT_CSS = """
 }
 .chat-badge.kb {
     background: rgba(75, 214, 255, 0.18);
-    color: #083c5a;
+    color: #b2f2ff;
 }
 .chat-badge.topic {
     background: rgba(255, 189, 111, 0.32);
-    color: #864400;
+    color: #ffd8b3;
 }
 .chat-badge.user {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.2);
     color: #f1f5ff;
 }
 .chat-body {
@@ -118,32 +119,73 @@ CHAT_CSS = """
 .chat-meta {
     margin-top: 14px;
     font-size: 0.83rem;
-    color: #4c5b7a;
+    color: rgba(255, 255, 255, 0.65);
 }
 .chat-row.user .chat-meta {
-    color: #c7dbff;
+    color: rgba(255, 255, 255, 0.7);
+}
+.prompt-hero {
+    margin: 34px 0 16px;
+    text-align: center;
+    color: #f3f6ff;
+}
+.prompt-hero .prompt-greeting {
+    font-size: 2.4rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+.prompt-hero .prompt-greeting span {
+    color: var(--sand);
+}
+.prompt-hero .prompt-subtitle {
+    margin-top: 6px;
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.72);
+}
+.prompt-card {
+    width: 100%;
+    background: rgba(8, 11, 22, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 32px;
+    padding: 22px 28px 28px;
+    box-shadow: 0 30px 65px rgba(0, 0, 0, 0.55);
+    margin-bottom: 16px;
+}
+.prompt-card .stTextInput > div > input {
+    background: transparent !important;
+    color: #eef4ff !important;
+    border: none !important;
+    font-size: 1.25rem !important;
+    padding-left: 0 !important;
+}
+.prompt-card .stTextInput > div > input::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+.prompt-actions {
+    margin-bottom: 20px;
 }
 .chat-empty {
-    background: #ebf2ff;
+    background: rgba(255, 255, 255, 0.07);
     border-radius: 18px;
     padding: 18px;
     text-align: center;
-    color: #15315c;
+    color: #dce6ff;
 }
 .plan-card {
     margin-top: 14px;
-    border: 1px solid rgba(13, 37, 78, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
     padding: 14px 16px;
-    background: #f9fbff;
+    background: rgba(10, 17, 33, 0.7);
     font-size: 0.93rem;
+    color: #f3f7ff;
 }
 .plan-card h5 {
     margin: 0 0 6px;
     font-size: 0.9rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: #0d2c5c;
+    color: #9bc9ff;
 }
 .plan-card ul {
     padding-left: 1.1rem;
@@ -152,7 +194,7 @@ CHAT_CSS = """
 .plan-card .plan-tips {
     margin-top: 6px;
     font-size: 0.82rem;
-    color: #334466;
+    color: #d2dbff;
 }
 .chunk-stack {
     margin-top: 18px;
@@ -162,19 +204,19 @@ CHAT_CSS = """
 }
 .chunk-meta {
     font-size: 0.82rem;
-    color: #4b5c7e;
+    color: rgba(255, 255, 255, 0.58);
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
 .chunk-card {
     border: 1px solid var(--card-border);
-    border-radius: 14px;
+    border-radius: 18px;
     padding: 12px 14px;
-    background: #ffffff;
+    background: rgba(7, 14, 30, 0.9);
 }
 .chunk-card.used {
     border-color: rgba(65, 163, 255, 0.5);
-    box-shadow: 0 8px 24px rgba(8, 37, 84, 0.08);
+    box-shadow: 0 8px 24px rgba(8, 37, 84, 0.2);
 }
 .chunk-card__header {
     display: flex;
@@ -183,24 +225,24 @@ CHAT_CSS = """
     justify-content: space-between;
     font-size: 0.84rem;
     font-weight: 600;
-    color: #0f2857;
+    color: #b9d5ff;
 }
 .chunk-card__body {
     margin-top: 6px;
     font-size: 0.92rem;
-    color: #101b33;
+    color: #f2f6ff;
     white-space: pre-wrap;
 }
 .chunk-card__reason {
     margin-top: 8px;
     font-size: 0.8rem;
-    color: #5c6a85;
+    color: rgba(255, 255, 255, 0.6);
 }
 .chunk-card__reason strong {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-size: 0.75rem;
-    color: #2a4472;
+    color: #8fb6ff;
 }
 .stTextInput > div > input {
     border-radius: 18px !important;
@@ -214,13 +256,16 @@ CHAT_CSS = """
     font-weight: 600 !important;
     font-size: 1rem !important;
     padding: 0.9rem 1rem !important;
+    background: rgba(255, 255, 255, 0.08);
+    color: #f5fbff;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .stButton button:first-child {
-    background: #0b2f63 !important;
+    background: linear-gradient(135deg, #0b2f63, #194d91) !important;
     color: #f5fbff !important;
 }
 .stButton button:hover {
-    box-shadow: 0 12px 30px rgba(7, 14, 40, 0.18);
+    box-shadow: 0 12px 30px rgba(7, 14, 40, 0.35);
 }
 </style>
 """
@@ -466,18 +511,30 @@ def _render_chat_feed():
 _render_chat_feed()
 
 st.markdown("---")
-
-query = st.text_input(
-    "Ask a naval question",
-    placeholder="e.g., What are actions in restricted visibility?",
-    key="kb_question_input",
+st.markdown(
+    """
+    <div class='prompt-hero'>
+        <div class='prompt-greeting'>Evening, Navy Watch</div>
+        <div class='prompt-subtitle'>How can I help you today?</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
-query = st.text_input("Ask a naval question", placeholder="e.g., What are actions in restricted visibility?")
+st.markdown("<div class='prompt-card'>", unsafe_allow_html=True)
+query = st.text_input(
+    "Ask a naval question",
+    placeholder="Ask anything about COLREGS, watchstanding, or navigation...",
+    key="kb_question_input",
+    label_visibility="collapsed",
+)
+st.markdown("</div>", unsafe_allow_html=True)
 
+st.markdown("<div class='prompt-actions'>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 kb_clicked = col1.button("Search KB + Answer", type="primary", use_container_width=True)
 topic_clicked = col2.button("Topic Chat (AI)", use_container_width=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
 question = query.strip()
 

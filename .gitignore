@@ -1,0 +1,28 @@
+# Secrets - never commit these
+.env
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# PDF source documents (too large for git)
+*.pdf
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Streamlit local secrets (for local dev only)
+.streamlit/secrets.toml

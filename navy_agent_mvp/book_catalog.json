@@ -1,0 +1,44 @@
+[
+  {
+    "source_file": "ROR COLREG.pdf",
+    "title": "International Regulations for Preventing Collisions at Sea (COLREG)",
+    "summary": "COLREG rules of the road. Covers: lookout, safe speed, risk of collision, give-way and stand-on vessels, crossing/overtaking/head-on situations, restricted visibility conduct, lights, shapes, fog signals, sound and light signals.",
+    "aliases": ["colreg", "ror", "rules of the road", "collision regulations", "rule 5", "rule 8", "rule 13", "rule 14", "rule 15", "rule 16", "rule 17", "rule 19"]
+  },
+  {
+    "source_file": "BR 45 vol (2).pdf",
+    "title": "BR 45 Volume 2 – Celestial Navigation",
+    "summary": "UK Royal Navy celestial navigation. Covers: celestial sphere theory, sight reduction, sun/star/planet sights, altitude and azimuth calculations, sight planning, nautical almanac, intercept method, running fixes, compass errors by celestial observation.",
+    "aliases": ["br45 vol2", "volume 2", "br 45 2", "celestial navigation", "star sight", "sun sight", "altitude azimuth", "nautical almanac"]
+  },
+  {
+    "source_file": "BR 45 vol (3).pdf",
+    "title": "BR 45 Volume 3 – Coastal and Ocean Navigation",
+    "summary": "UK Royal Navy coastal and ocean navigation. Covers: chart work, position fixing, tidal calculations, current and leeway, passage planning, ocean routing, waypoints, buoyage, pilotage, position lines, fixes by bearings and transits, ECDIS.",
+    "aliases": ["br45 vol3", "volume 3", "br 45 3", "coastal navigation", "chart work", "passage planning", "tides", "pilotage", "buoyage"]
+  },
+  {
+    "source_file": "BR 45 vol (4).pdf",
+    "title": "BR 45 Volume 4 – Radar Navigation and Watchkeeping",
+    "summary": "UK Royal Navy radar operations and navigational watchkeeping. Covers: radar principles, blind arcs, off-centring, guard zones, sector transmission, pulse length, radar plotting, ARPA, collision avoidance using radar, OOW duties, radar in restricted visibility, target tracking, close-quarters situations.",
+    "aliases": ["br45 vol4", "volume 4", "br 45 4", "radar", "arpa", "watchkeeping", "oow", "officer of the watch", "blind arc", "guard zone", "pulse length", "radar plot", "collision avoidance radar"]
+  },
+  {
+    "source_file": "BR 45 vol (5).pdf",
+    "title": "BR 45 Volume 5 – Navigation in Ice and Special Conditions",
+    "summary": "UK Royal Navy navigation in ice, shallow water, and special conditions. Covers: ice navigation, polar operations, shallow water effects, anchor work, towing, replenishment at sea navigation, and special seamanship evolutions.",
+    "aliases": ["br45 vol5", "volume 5", "br 45 5", "ice navigation", "polar", "shallow water", "anchoring", "towing", "replenishment at sea"]
+  },
+  {
+    "source_file": "BR 45 vol (6).pdf",
+    "title": "BR 45 Volume 6 – Electronic Navigation Systems",
+    "summary": "UK Royal Navy electronic navigation systems. Covers: GPS, GNSS, ECDIS operation, AIS (Automatic Identification System), integrated navigation, electronic chart display, system failures, fallback procedures, and navigation data management.",
+    "aliases": ["br45 vol6", "volume 6", "br 45 6", "ecdis", "gps", "gnss", "ais", "electronic navigation", "automatic identification system"]
+  },
+  {
+    "source_file": "BR 45 vol (7).pdf",
+    "title": "BR 45 Volume 7 – Navigation Publications and References",
+    "summary": "UK Royal Navy navigation publications, corrections, and references. Covers: Notices to Mariners, chart corrections, publication maintenance, hydrographic office references, navigational warnings, and management of navigational documents.",
+    "aliases": ["br45 vol7", "volume 7", "br 45 7", "notices to mariners", "chart corrections", "hydrographic", "navigational warnings", "admiralty"]
+  }
+]

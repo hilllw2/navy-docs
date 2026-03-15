@@ -62,6 +62,7 @@ def synthesize_answer_node(state: AgentState) -> AgentState:
     user_query = state["user_query"]
     refined_query = state["route"]["refined_query"]
     plan = state.get("answer_plan") or {}
+    book_hint = state.get("book_context_hint") or ""
     plan_heading = plan.get("heading") or user_query
     plan_sections = plan.get("sections") or []
     plan_style = plan.get("style_tips") or [
@@ -98,6 +99,8 @@ def synthesize_answer_node(state: AgentState) -> AgentState:
 
     prompt = (
         "You are a naval expert assistant. Follow the provided plan exactly when writing the answer.\n\n"
+        "BOOK_CONTEXT:\n"
+        f"{book_hint or 'General Royal Navy seamanship reference.'}\n\n"
         "PLAN_HEADING:\n"
         f"{plan_heading}\n\n"
         "PLAN_SECTIONS (execute in order):\n"

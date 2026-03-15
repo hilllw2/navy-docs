@@ -8,7 +8,7 @@ from navy_agent_mvp.state import AgentState, AnswerPlan
 from navy_agent_mvp.utils import parse_json_loose, truncate
 
 
-def _default_plan(user_query: str) -> AnswerPlan:
+def _default_plan(user_query: str, book_hint: str = "") -> AnswerPlan:
     title = (user_query or "").strip().rstrip("?") or "Response"
     heading = title[:90]
     return {
@@ -34,9 +34,10 @@ def plan_answer_node(state: AgentState) -> AgentState:
     user_query = state["user_query"]
     refined_query = state["route"].get("refined_query") or user_query
     hits = state.get("hits", [])
+    book_hint = state.get("book_context_hint") or ""
 
     if not hits:
-        state["answer_plan"] = _default_plan(user_query)
+        state["answer_plan"] = _default_plan(user_query, book_hint)
         return state
 
     snippet_lines: List[str] = []
@@ -54,6 +55,7 @@ def plan_answer_node(state: AgentState) -> AgentState:
         "No prose. JSON only.\n\n"
         f"QUESTION:\n{user_query}\n\n"
         f"REFINED_QUERY:\n{refined_query}\n\n"
+        f"BOOK_CONTEXT:\n{book_hint or 'General naval seamanship reference.'}\n\n"
         f"SNIPPETS:\n" + "\n\n".join(snippet_lines)
     )
 
@@ -61,7 +63,7 @@ def plan_answer_node(state: AgentState) -> AgentState:
     text_model, _ = get_models()
     client = genai.Client(api_key=api_key)
 
-    plan = _default_plan(user_query)
+    plan = _default_plan(user_query, book_hint)
     try:
         resp = client.models.generate_content(
             model=text_model,

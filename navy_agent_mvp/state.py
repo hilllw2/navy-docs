@@ -67,5 +67,6 @@ class AgentState(TypedDict):
     answer_markdown: str
     citations: List[Citation]
     evidence_cards: List[EvidenceCard]
+    book_context_hint: str
     answer_plan: AnswerPlan
     route_debug: Dict[str, Any]

@@ -52,6 +52,7 @@ def run_agent(
         "answer_markdown": "",
         "citations": [],
         "evidence_cards": [],
+        "book_context_hint": "",
         "answer_plan": {"heading": "", "sections": [], "style_tips": []},
         "route_debug": {},
     }

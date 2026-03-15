@@ -546,13 +546,29 @@ if kb_clicked:
         st.warning("Please enter a question before running the KB search.")
     else:
         _append_chat_message("user", question, mode="kb")
-        with st.spinner("Searching knowledge base and generating answer..."):
-            result = run_agent(
-                question,
-                top_k=top_k,
-                conversation_context=_build_short_context(),
-                source_file_lock=locked_source,
+        result = None
+        try:
+            with st.spinner("Searching knowledge base and generating answer..."):
+                result = run_agent(
+                    question,
+                    top_k=top_k,
+                    conversation_context=_build_short_context(),
+                    source_file_lock=locked_source,
+                )
+        except Exception as exc:
+            st.error(f"KB search failed: {exc}")
+            st.session_state.topic_active = False
+            _append_chat_message(
+                "assistant",
+                "I couldn't complete the KB search due to an internal error. Please try again.",
+                mode="kb",
             )
+            st.stop()
+
+        if result is None:
+            st.error("No result returned from the agent.")
+            st.session_state.topic_active = False
+            st.stop()
 
         route = result["route"]
         answer_text = result.get("answer_markdown") or "No answer generated."

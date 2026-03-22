@@ -24,6 +24,7 @@ services:
       args:
         NEXT_PUBLIC_SUPABASE_URL: ${SUPABASE_URL}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_API_URL: http://34.173.34.205:8000
     container_name: navy-frontend
     ports:
       - "3000:3000"

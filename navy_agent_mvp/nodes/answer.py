@@ -85,6 +85,14 @@ def synthesize_answer_node(state: AgentState) -> AgentState:
         "Be direct and confident.",
         "Use compact bullets for multiple steps.",
     ]
+    
+    # Check relevance of retrieved chunks - filter out low-quality matches
+    RELEVANCE_THRESHOLD = 0.35  # Minimum similarity score to consider
+    if hits:
+        relevant_hits = [h for h in hits if h.get("similarity", 0.0) >= RELEVANCE_THRESHOLD]
+        if len(relevant_hits) < len(hits) * 0.5:  # If more than half are below threshold
+            # Evidence quality is poor, be more cautious
+            hits = relevant_hits if relevant_hits else hits[:2]  # Keep at most 2 if all are poor
 
     section_lines: List[str] = []
     for idx, section in enumerate(plan_sections, start=1):
@@ -100,13 +108,18 @@ def synthesize_answer_node(state: AgentState) -> AgentState:
 
     if not hits:
         if conversation_context:
+            style_hint = "Keep your answer brief and direct."
+            if mode['detail']:
+                style_hint = "Provide a clear explanation."
+            elif mode['steps']:
+                style_hint = "List the steps clearly."
+            
             prompt = (
-                "You are a naval training assistant. Answer using ONLY the provided conversation context.\n"
-                "If the context is insufficient, say so and suggest running a KB search.\n"
-                "Return markdown text only (no JSON).\n\n"
-                f"RESPONSE_MODE:\n- concise={mode['concise']}\n- detail={mode['detail']}\n- table={mode['table']}\n- steps={mode['steps']}\n\n"
+                "You are a Royal Navy training assistant. Answer based on the conversation context provided.\n\n"
+                f"QUESTION: {user_query}\n\n"
+                f"STYLE: {style_hint}\n\n"
                 f"CONTEXT:\n{conversation_context}\n\n"
-                f"QUESTION:\n{user_query}"
+                "If the context doesn't contain the answer, say so clearly and suggest searching the knowledge base."
             )
             api_key = get_gemini_api_key()
             text_model, _ = get_models()
@@ -126,54 +139,56 @@ def synthesize_answer_node(state: AgentState) -> AgentState:
                 pass
 
         state["answer_markdown"] = _ensure_heading(
-            "I could not find relevant evidence in the indexed books.",
-            plan_heading,
+            "I don't have information about this in the available training manuals. "
+            "Please try rephrasing your question or ask about a different topic.",
+            "Information Not Available",
         )
         state["citations"] = []
         return state
 
     min_chunk_usage = min(len(hits), 3)
+    
+    # Calculate average similarity to assess evidence quality
+    avg_similarity = sum(h.get('similarity', 0.0) for h in hits) / len(hits) if hits else 0.0
+    evidence_quality = "strong" if avg_similarity >= 0.6 else "moderate" if avg_similarity >= 0.4 else "weak"
 
     evidence_lines: List[str] = []
     for idx, h in enumerate(hits, start=1):
         evidence_lines.append(
-            f"[{idx}] source_file={h['source_file']} page={h.get('page_start')} line={h.get('line_start')} similarity={h.get('similarity', 0.0):.4f}\n"
-            f"chunk_text: {h.get('chunk_text', '')}\n"
+            f"[{idx}] (similarity: {h.get('similarity', 0.0):.2f})\n"
+            f"{h.get('chunk_text', '')}\n"
         )
 
+    # Build a simpler, more direct prompt
+    response_style = "Answer directly and concisely."
+    if mode['concise']:
+        response_style = "Give a brief, to-the-point answer (2-4 sentences or 3-5 bullets max)."
+    elif mode['detail']:
+        response_style = "Provide a clear explanation with necessary details (1-2 short paragraphs)."
+    elif mode['steps']:
+        response_style = "List the steps clearly and concisely (numbered list)."
+    elif mode['table']:
+        response_style = "Present information in a comparison table."
+    
     prompt = (
-        "You are a naval expert assistant. Write CONCISE, direct answers. Keep it SHORT.\n\n"
-        "BOOK_CONTEXT:\n"
-        f"{book_hint or 'General Royal Navy seamanship reference.'}\n\n"
-        "PLAN_HEADING:\n"
-        f"{plan_heading}\n\n"
-        "PLAN_SECTIONS (execute in order):\n"
-        + "\n".join(section_lines)
-        + "\n\nSTYLE_TIPS:\n"
-        f"{style_line}\n\n"
-        "RESPONSE_MODE:\n"
-        f"- concise={mode['concise']}\n"
-        f"- detail={mode['detail']}\n"
-        f"- table={mode['table']}\n"
-        f"- steps={mode['steps']}\n\n"
-        "STEP-BY-STEP:\n"
-        "1) Start with the plan heading as an H3 markdown line.\n"
-        "2) Use 2-3 short bullet points or 1-2 brief paragraphs MAX.\n"
-        "3) Do NOT mention book names, page numbers, or citation markers.\n"
-        "4) Integrate at least "
-        f"{min_chunk_usage} distinct evidence chunk{'s' if min_chunk_usage != 1 else ''} unless fewer chunks were retrieved.\n"
-        "5) If evidence is insufficient, say so plainly.\n"
-        "6) Use blank lines between heading, paragraphs, lists, and tables.\n"
-        "7) If you include a table, use GFM syntax with a header row and separator row.\n"
-        "8) NO lengthy explanations. Be DIRECT and CONCISE.\n\n"
-        "OUTPUT FORMAT:\n"
-        "Return STRICT JSON with keys answer_markdown (string) and used_citations (array of integers).\n"
-        "No markdown fences. No extra keys.\n\n"
-        f"USER_QUESTION:\n{user_query}\n\n"
-        f"REFINED_QUERY:\n{refined_query}\n\n"
-        f"CONVERSATION_CONTEXT:\n{conversation_context or 'none'}\n\n"
-        "EVIDENCE CHUNKS:\n"
+        "You are a Royal Navy training assistant. Answer the question using the evidence provided.\n\n"
+        f"QUESTION: {user_query}\n\n"
+        f"RESPONSE STYLE: {response_style}\n\n"
+        f"EVIDENCE QUALITY: {evidence_quality}\\n\\n"
+        "RULES:\\n"
+        "- Start with ### heading that summarizes the answer\\n"
+        "- Answer DIRECTLY - don't over-explain or add unnecessary context\\n"
+        "- Use the evidence to support your answer\\n"
+        "- Keep it SHORT and PRACTICAL\\n"
+        "- Don't mention source files, pages, or citation numbers in your answer\\n"
+        "- If evidence quality is weak or doesn't answer the question, be honest about limitations\\n"
+        "- For strong evidence, answer confidently; for weak evidence, acknowledge uncertainty\\n\\n"
+        f"CONTEXT: {book_hint or 'Royal Navy training manual'}\n\n"
+        "EVIDENCE:\n"
         + "\n".join(evidence_lines)
+        + "\n\nOUTPUT: Return JSON with keys 'answer_markdown' (string) and 'used_citations' (array of integers 1-"
+        + str(len(hits))
+        + "). No markdown fences."
     )
 
     api_key = get_gemini_api_key()
@@ -186,7 +201,7 @@ def synthesize_answer_node(state: AgentState) -> AgentState:
         resp = client.models.generate_content(
             model=text_model,
             contents=prompt,
-            config=types.GenerateContentConfig(temperature=0.1),
+            config=types.GenerateContentConfig(temperature=0.3),
         )
         data = parse_json_loose(resp.text or "")
         if isinstance(data, dict):

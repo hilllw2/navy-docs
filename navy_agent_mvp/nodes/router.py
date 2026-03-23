@@ -42,19 +42,20 @@ def route_query_node(state: AgentState) -> AgentState:
     )
 
     prompt = (
-        "You are a naval knowledge router for Royal Navy training manuals.\n"
-        "You MUST understand each book's scope from the catalog and pick the one that best contains the answer.\n"
-        "Given the user question and catalog, output STRICT JSON with keys:\n"
-        "refined_query (string), target_source_file (string or null), routing_confidence (0..1 number), route_reason_short (string).\n"
-        "Rules:\n"
-        "1) target_source_file MUST be one exact source_file from catalog or null.\n"
-        "2) refined_query should improve retrieval intent using technical terms or rule numbers.\n"
-        "3) route_reason_short should cite the deciding book focus (e.g., 'towing procedures -> BR45 vol6').\n"
-        "4) Prefer BR45 volumes for shiphandling, COLREG doc for collision rules.\n"
-        "5) Return JSON only.\n\n"
-        f"CATALOG:\n{catalog_text}\n\n"
-        f"SHORT_CONTEXT (recent chat summary):\n{conversation_context or 'none'}\n\n"
-        f"USER_QUERY:\n{query}\n"
+        "You are a naval knowledge router. Analyze the user's question and match it to the most relevant training manual.\n\n"
+        "TASK: Return JSON with these keys:\n"
+        "- refined_query: Clarify the question using naval terminology (keep it simple for straightforward questions)\n"
+        "- target_source_file: Exact source_file from catalog or null\n"
+        "- routing_confidence: 0.0-1.0 (use 0.8+ for clear matches, 0.5-0.7 for uncertain, <0.5 for no match)\n"
+        "- route_reason_short: Brief explanation (max 15 words)\n\n"
+        "GUIDELINES:\n"
+        "- For simple, direct questions: keep refined_query close to original\n"
+        "- Match book focus to question topic (e.g., towing→BR45 vol6, collision rules→COLREG)\n"
+        "- If question is clear and book is obvious, set confidence 0.85+\n"
+        "- Return JSON only, no markdown\n\n"
+        f"AVAILABLE BOOKS:\n{catalog_text}\n\n"
+        f"RECENT CONTEXT:\n{conversation_context or 'none'}\n\n"
+        f"USER QUESTION:\n{query}\n"
     )
 
     route = {

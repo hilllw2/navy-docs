@@ -31,47 +31,18 @@ def _default_plan(user_query: str, book_hint: str = "") -> AnswerPlan:
     hints = _detect_style_hints(user_query)
     title = (user_query or "").strip().rstrip("?") or "Response"
     heading = title[:90]
-    sections = [
-        {
-            "title": "Key Points",
-            "instruction": "Summarize the most relevant facts you can support with evidence.",
-        }
-    ]
+    
+    # Simplified: just one section for most cases
+    sections = [{"title": "Answer", "instruction": "Provide a direct answer to the question."}]
 
+    # Simple style tips based on question type
+    style_tips = ["Be direct and concise."]
     if hints["steps"]:
-        sections.append(
-            {
-                "title": "Procedure",
-                "instruction": "Provide a short numbered checklist or step-by-step guidance.",
-            }
-        )
+        style_tips.append("Use numbered steps.")
     elif hints["table"]:
-        sections.append(
-            {
-                "title": "Comparison",
-                "instruction": "Provide a compact markdown table contrasting key items.",
-            }
-        )
-    else:
-        sections.append(
-            {
-                "title": "Practical Guidance",
-                "instruction": "Explain what the watchstander should do next or remember.",
-            }
-        )
-
-    style_tips = [
-        "Keep sentences tight and declarative.",
-        "Use short bullets for multi-step procedures.",
-    ]
-    if hints["concise"]:
-        style_tips.append("Be concise: aim for 4-8 bullets max.")
-    if hints["detail"]:
-        style_tips.append("Allow 2-4 short paragraphs for context and rationale.")
-    if hints["table"]:
-        style_tips.append("Use a markdown table where it helps comparison.")
-    if hints["steps"]:
-        style_tips.append("Use numbered steps for procedures.")
+        style_tips.append("Use a comparison table.")
+    elif hints["concise"]:
+        style_tips.append("Keep it brief (3-5 bullets max).")
 
     return {
         "heading": heading,
@@ -98,15 +69,14 @@ def plan_answer_node(state: AgentState) -> AgentState:
         )
 
     prompt = (
-        "You are a planning assistant for a naval question-answering agent.\n"
-        "Given the user question, refined query, and supporting snippets, create a compact plan.\n"
-        "Return STRICT JSON with keys: heading (string), sections (array of 1-4 objects), style_tips (array of 1-3 strings).\n"
-        "Each section object must have title and instruction.\n"
-        "No prose. JSON only.\n\n"
-        f"QUESTION:\n{user_query}\n\n"
-        f"REFINED_QUERY:\n{refined_query}\n\n"
-        f"BOOK_CONTEXT:\n{book_hint or 'General naval seamanship reference.'}\n\n"
-        f"SNIPPETS:\n" + "\n\n".join(snippet_lines)
+        "Create a simple answer plan for this naval training question.\n\n"
+        f"QUESTION: {user_query}\n\n"
+        "Return JSON with:\n"
+        "- heading: Brief title for the answer (max 90 chars)\n"
+        "- sections: Array with 1-2 objects, each having 'title' and 'instruction'\n"
+        "- style_tips: Array with 1-2 brief style hints\n\n"
+        "Keep it simple. For straightforward questions, use just one section.\n\n"
+        f"EVIDENCE PREVIEW:\n" + "\n\n".join(snippet_lines[:3])
     )
 
     api_key = get_gemini_api_key()
@@ -118,7 +88,7 @@ def plan_answer_node(state: AgentState) -> AgentState:
         resp = client.models.generate_content(
             model=text_model,
             contents=prompt,
-            config=types.GenerateContentConfig(temperature=0.1),
+            config=types.GenerateContentConfig(temperature=0.2),
         )
         data = parse_json_loose(resp.text or "")
         if isinstance(data, dict):
